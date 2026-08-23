@@ -33,6 +33,7 @@ namespace Game.Editor
         private readonly LevelScenePreview preview = new LevelScenePreview();
 
         private LevelGrid grid;
+        private GridDragState drag;
         private Vector2 scroll;
 
         [MenuItem("Tools/SmashFest/Level Brush")]
@@ -66,7 +67,7 @@ namespace Game.Editor
             EditorGUILayout.HelpBox(
                 "Paint places the selected prefab. Rotate turns the object under the cursor " +
                 "by the rotation step, re-fitting its cells. Erase removes it.\n" +
-                "Shift-click erases whatever the active tool is.\n" +
+                "Paint and Erase can be dragged across cells. Shift-click always erases.\n" +
                 "Brush active spawns a preview object in the scene; unchecking destroys it.",
                 MessageType.Info);
 
@@ -81,9 +82,15 @@ namespace Game.Editor
 
             EditorGUILayout.Space();
 
-            if (!LevelGridGui.Draw(grid, level, out CellIndex cell, out bool shift)) return;
+            GridInput input = LevelGridGui.Draw(grid, level, ref drag);
+            if (!input.Acted) return;
 
-            Apply(shift ? BrushTool.Erase : tool, cell);
+            BrushTool active = input.Shift ? BrushTool.Erase : tool;
+
+            if (input.IsDrag && active == BrushTool.Rotate) return;
+
+            Apply(active, input.Cell);
+            Repaint();
         }
 
         private void DrawBrushToggle()

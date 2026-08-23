@@ -4,6 +4,21 @@ using UnityEngine;
 
 namespace Game.Editor
 {
+    public struct GridDragState
+    {
+        public bool Dragging;
+        public bool HasLast;
+        public CellIndex LastCell;
+    }
+
+    public struct GridInput
+    {
+        public bool Acted;
+        public bool IsDrag;
+        public bool Shift;
+        public CellIndex Cell;
+    }
+
     public static class LevelGridGui
     {
         private const float CellSize = 34f;
@@ -27,14 +42,20 @@ namespace Game.Editor
             return GUILayout.Toolbar(Mathf.Clamp(level, 0, levels - 1), labels);
         }
 
-        public static bool Draw(LevelGrid grid, int level, out CellIndex clicked, out bool shift)
+        public static GridInput Draw(LevelGrid grid, int level, ref GridDragState drag)
         {
-            clicked = default;
-            shift = false;
+            var input = new GridInput();
 
-            if (grid == null) return false;
+            if (grid == null) return input;
 
-            bool hit = false;
+            Event current = Event.current;
+
+            if (current.rawType == EventType.MouseUp && current.button == 0)
+            {
+                drag.Dragging = false;
+                drag.HasLast = false;
+            }
+
             Color previous = GUI.backgroundColor;
 
             for (int z = grid.Depth - 1; z >= 0; z--)
@@ -45,14 +66,13 @@ namespace Game.Editor
                 {
                     var cell = new CellIndex(x, level, z);
 
-                    GUI.backgroundColor = BackgroundFor(grid, cell, out string label);
+                    Rect rect = GUILayoutUtility.GetRect(
+                        CellSize, CellSize, GUILayout.Width(CellSize), GUILayout.Height(CellSize));
 
-                    if (GUILayout.Button(label, GUILayout.Width(CellSize), GUILayout.Height(CellSize)))
-                    {
-                        clicked = cell;
-                        shift = Event.current.shift;
-                        hit = true;
-                    }
+                    GUI.backgroundColor = BackgroundFor(grid, cell, out string label);
+                    GUI.Box(rect, label, GUI.skin.button);
+
+                    HandleCell(rect, cell, current, ref drag, ref input);
                 }
 
                 EditorGUILayout.EndHorizontal();
@@ -60,7 +80,39 @@ namespace Game.Editor
 
             GUI.backgroundColor = previous;
 
-            return hit;
+            return input;
+        }
+
+        private static void HandleCell(
+            Rect rect, CellIndex cell, Event current, ref GridDragState drag, ref GridInput input)
+        {
+            if (current.button != 0 || !rect.Contains(current.mousePosition)) return;
+
+            if (current.type == EventType.MouseDown)
+            {
+                drag.Dragging = true;
+                Report(cell, current, false, ref drag, ref input);
+                current.Use();
+                return;
+            }
+
+            if (current.type != EventType.MouseDrag || !drag.Dragging) return;
+            if (drag.HasLast && drag.LastCell.Equals(cell)) return;
+
+            Report(cell, current, true, ref drag, ref input);
+            current.Use();
+        }
+
+        private static void Report(
+            CellIndex cell, Event current, bool isDrag, ref GridDragState drag, ref GridInput input)
+        {
+            drag.LastCell = cell;
+            drag.HasLast = true;
+
+            input.Acted = true;
+            input.IsDrag = isDrag;
+            input.Shift = current.shift;
+            input.Cell = cell;
         }
 
         private static Color BackgroundFor(LevelGrid grid, CellIndex cell, out string label)

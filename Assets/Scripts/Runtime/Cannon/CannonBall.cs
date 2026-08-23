@@ -22,7 +22,7 @@ public class CannonBall : MonoBehaviour
 
     public void Launch(Vector3 velocity)
     {
-        rb.linearVelocity = velocity;   // Unity 2022 ve öncesi: rb.velocity
+        rb.linearVelocity = velocity;
         velocityBeforeCollision = velocity;
 
         Destroy(gameObject, maxLifetime);

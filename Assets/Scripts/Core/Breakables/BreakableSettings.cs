@@ -11,20 +11,17 @@ namespace Game.Core.Breakables
 
         private readonly float ballMinSpeed;
         private readonly float groundMinSpeed;
-        private readonly float debrisMinSpeed;
 
         public BreakableSettings(
             float maxHealth,
             float damagePerSpeedUnit,
             float ballMinSpeed,
-            float groundMinSpeed,
-            float debrisMinSpeed)
+            float groundMinSpeed)
         {
             MaxHealth = maxHealth;
             DamagePerSpeedUnit = damagePerSpeedUnit;
             this.ballMinSpeed = ballMinSpeed;
             this.groundMinSpeed = groundMinSpeed;
-            this.debrisMinSpeed = debrisMinSpeed;
         }
 
         public float DamageFor(in ImpactEvent impact)
@@ -37,7 +34,6 @@ namespace Game.Core.Breakables
         {
             ImpactSource.Ball => ballMinSpeed,
             ImpactSource.Ground => groundMinSpeed,
-            ImpactSource.Debris => debrisMinSpeed,
             _ => Immune
         };
     }

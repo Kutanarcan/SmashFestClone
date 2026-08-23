@@ -14,10 +14,10 @@ namespace Game.Tests.EditMode
         private const float Tolerance = 0.001f;
 
         private static BreakableSettings JarLike() => new BreakableSettings(
-            MaxHealth, DamagePerSpeedUnit, BallMinSpeed, GroundMinSpeed, BreakableSettings.Immune);
+            MaxHealth, DamagePerSpeedUnit, BallMinSpeed, GroundMinSpeed);
 
         private static BreakableSettings CubeLike() => new BreakableSettings(
-            MaxHealth, DamagePerSpeedUnit, BreakableSettings.Immune, GroundMinSpeed, BreakableSettings.Immune);
+            MaxHealth, DamagePerSpeedUnit, BreakableSettings.Immune, GroundMinSpeed);
 
         private static ImpactEvent Impact(ImpactSource source, float speed) =>
             new ImpactEvent(source, speed, Vector3.zero, Vector3.up);

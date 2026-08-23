@@ -4,7 +4,6 @@ namespace Game.Core.Impacts
     {
         Unknown = 0,
         Ball = 1,
-        Ground = 2,
-        Debris = 3
+        Ground = 2
     }
 }

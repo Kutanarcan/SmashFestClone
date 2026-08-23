@@ -20,11 +20,6 @@ public class Breakable : MonoBehaviour
     [SerializeField] private bool damagedByGround;
     [SerializeField] private float groundMinSpeed = 5f;
 
-    [SerializeField] private LayerMask debrisLayers;
-
-    [SerializeField] private bool damagedByDebris;
-    [SerializeField] private float debrisMinSpeed = 5f;
-
     private BreakableBody body;
 
     public event ImpactHandler Broke;
@@ -39,8 +34,7 @@ public class Breakable : MonoBehaviour
             maxHealth,
             damagePerSpeedUnit,
             MinSpeedOrImmune(damagedByBall, ballMinSpeed),
-            MinSpeedOrImmune(damagedByGround, groundMinSpeed),
-            MinSpeedOrImmune(damagedByDebris, debrisMinSpeed)));
+            MinSpeedOrImmune(damagedByGround, groundMinSpeed)));
 
         body.Broke += OnBodyBroke;
     }
@@ -74,7 +68,6 @@ public class Breakable : MonoBehaviour
 
         if ((ballLayers.value & bit) != 0) return ImpactSource.Ball;
         if ((groundLayers.value & bit) != 0) return ImpactSource.Ground;
-        if ((debrisLayers.value & bit) != 0) return ImpactSource.Debris;
 
         return ImpactSource.Unknown;
     }

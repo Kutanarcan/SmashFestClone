@@ -501,11 +501,6 @@ MonoBehaviour:
     m_Bits: 64
   damagedByGround: 0
   groundMinSpeed: 5
-  debrisLayers:
-    serializedVersion: 2
-    m_Bits: 64
-  damagedByDebris: 0
-  debrisMinSpeed: 5
 --- !u!114 &2527904169731814986
 MonoBehaviour:
   m_ObjectHideFlags: 0

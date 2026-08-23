@@ -1,5 +1,6 @@
 using System;
 using Game.Core.Aiming;
+using Game.Core.Ballistics;
 using Game.Core.Firing;
 using Game.Core.Inputs;
 using UnityEngine;
@@ -14,8 +15,10 @@ namespace Game.Core.Cannon
         private readonly IBallLauncher launcher;
         private readonly FireControl fireControl;
         private readonly BarrelAim barrelAim;
+        private readonly BallisticAim ballisticAim;
 
         private Vector3 aimPoint;
+        private Vector3 launchVelocity;
 
         public CannonBrain(
             IPointerInputSource input,
@@ -23,7 +26,8 @@ namespace Game.Core.Cannon
             IBarrelView barrel,
             IBallLauncher launcher,
             FireControl fireControl,
-            BarrelAim barrelAim)
+            BarrelAim barrelAim,
+            BallisticAim ballisticAim)
         {
             this.input = input ?? throw new ArgumentNullException(nameof(input));
             this.raycaster = raycaster ?? throw new ArgumentNullException(nameof(raycaster));
@@ -31,11 +35,16 @@ namespace Game.Core.Cannon
             this.launcher = launcher ?? throw new ArgumentNullException(nameof(launcher));
             this.fireControl = fireControl ?? throw new ArgumentNullException(nameof(fireControl));
             this.barrelAim = barrelAim;
+            this.ballisticAim = ballisticAim;
         }
 
         public bool HasAimed { get; private set; }
 
+        public bool CanReachAim { get; private set; }
+
         public Vector3 AimPoint => aimPoint;
+
+        public Vector3 LaunchVelocity => launchVelocity;
 
         public void Tick(float deltaTime)
         {
@@ -53,17 +62,20 @@ namespace Game.Core.Cannon
             aimPoint = worldPoint;
             HasAimed = true;
 
+            CanReachAim = ballisticAim.TryVelocityTo(
+                launcher.MuzzlePosition, aimPoint, out launchVelocity);
+
             if (!fireControl.TryFire())
                 return;
 
-            launcher.LaunchTowards(aimPoint);
+            launcher.Launch(launchVelocity);
         }
 
         private void UpdateBarrel(float deltaTime)
         {
             if (!HasAimed) return;
 
-            if (!barrel.TryGetLocalDirection(aimPoint, out Vector3 localDirection))
+            if (!barrel.TryToLocalDirection(launchVelocity, out Vector3 localDirection))
                 return;
 
             if (!barrelAim.TryResolve(localDirection, out AimAngles angles))

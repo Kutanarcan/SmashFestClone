@@ -12,11 +12,11 @@ namespace Game.Tests.EditMode.Fakes
         public int ApplyCount { get; private set; }
         public AimAngles LastAngles { get; private set; }
         public float LastDeltaTime { get; private set; }
-        public Vector3 LastWorldTarget { get; private set; }
+        public Vector3 LastWorldDirection { get; private set; }
 
-        public bool TryGetLocalDirection(Vector3 worldTarget, out Vector3 localDirection)
+        public bool TryToLocalDirection(Vector3 worldDirection, out Vector3 localDirection)
         {
-            LastWorldTarget = worldTarget;
+            LastWorldDirection = worldDirection;
             localDirection = CanResolveDirection ? LocalDirection : default;
             return CanResolveDirection;
         }

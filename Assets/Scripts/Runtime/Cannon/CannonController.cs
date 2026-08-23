@@ -1,5 +1,6 @@
 using Game.Core;
 using Game.Core.Aiming;
+using Game.Core.Ballistics;
 using Game.Core.Cannon;
 using Game.Core.Firing;
 using Game.Core.Inputs;
@@ -33,6 +34,8 @@ public class CannonController : MonoBehaviour, ITickable
     [Header("Firing")]
     [SerializeField] private float launchSpeed = 30f;
 
+    [SerializeField] private ArcPreference arc = ArcPreference.Low;
+
     [SerializeField] private float fireCooldown = 0.35f;
     [SerializeField] private float maxAimDistance = 500f;
 
@@ -46,9 +49,10 @@ public class CannonController : MonoBehaviour, ITickable
             input,
             new CameraAimRaycaster(cam, aimLayerMask, maxAimDistance),
             new TransformBarrelView(barrel, barrelAxisOffset, rotationSpeed),
-            new CannonBallLauncher(muzzle, ballPrefab, launchSpeed),
+            new CannonBallLauncher(muzzle, ballPrefab),
             new FireControl(time, fireCooldown),
-            new BarrelAim(minElevation, maxElevation, maxYaw));
+            new BarrelAim(minElevation, maxElevation, maxYaw),
+            new BallisticAim(new BallisticSolver(-Physics.gravity.y), launchSpeed, arc));
     }
 
     public void Tick(float deltaTime)

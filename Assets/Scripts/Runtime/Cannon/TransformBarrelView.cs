@@ -17,17 +17,15 @@ namespace Game.Runtime.Cannon
             this.rotationSpeed = rotationSpeed;
         }
 
-        public bool TryGetLocalDirection(Vector3 worldTarget, out Vector3 localDirection)
+        public bool TryToLocalDirection(Vector3 worldDirection, out Vector3 localDirection)
         {
             localDirection = default;
 
             if (barrel == null) return false;
 
-            Vector3 toTarget = worldTarget - barrel.position;
-
             localDirection = barrel.parent != null
-                ? barrel.parent.InverseTransformDirection(toTarget)
-                : toTarget;
+                ? barrel.parent.InverseTransformDirection(worldDirection)
+                : worldDirection;
 
             return true;
         }

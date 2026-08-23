@@ -5,30 +5,28 @@ namespace Game.Runtime.Cannon
 {
     public sealed class CannonBallLauncher : IBallLauncher
     {
-        private const float MinDirectionSqrMagnitude = 0.0001f;
+        private const float MinVelocitySqrMagnitude = 0.0001f;
 
         private readonly Transform muzzle;
         private readonly CannonBall prefab;
-        private readonly float launchSpeed;
 
-        public CannonBallLauncher(Transform muzzle, CannonBall prefab, float launchSpeed)
+        public CannonBallLauncher(Transform muzzle, CannonBall prefab)
         {
             this.muzzle = muzzle;
             this.prefab = prefab;
-            this.launchSpeed = launchSpeed;
         }
 
-        public void LaunchTowards(Vector3 worldTarget)
+        public Vector3 MuzzlePosition => muzzle != null ? muzzle.position : Vector3.zero;
+
+        public void Launch(Vector3 velocity)
         {
             if (muzzle == null || prefab == null) return;
+            if (velocity.sqrMagnitude < MinVelocitySqrMagnitude) return;
 
-            Vector3 toTarget = worldTarget - muzzle.position;
-            if (toTarget.sqrMagnitude < MinDirectionSqrMagnitude) return;
+            CannonBall ball = Object.Instantiate(
+                prefab, muzzle.position, Quaternion.LookRotation(velocity.normalized));
 
-            Vector3 dir = toTarget.normalized;
-
-            CannonBall ball = Object.Instantiate(prefab, muzzle.position, Quaternion.LookRotation(dir));
-            ball.Launch(dir * launchSpeed);
+            ball.Launch(velocity);
         }
     }
 }

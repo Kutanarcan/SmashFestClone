@@ -5,13 +5,15 @@ namespace Game.Tests.EditMode.Fakes
 {
     public sealed class FakeBallLauncher : IBallLauncher
     {
-        public int LaunchCount { get; private set; }
-        public Vector3 LastTarget { get; private set; }
+        public Vector3 MuzzlePosition { get; set; }
 
-        public void LaunchTowards(Vector3 worldTarget)
+        public int LaunchCount { get; private set; }
+        public Vector3 LastVelocity { get; private set; }
+
+        public void Launch(Vector3 velocity)
         {
             LaunchCount++;
-            LastTarget = worldTarget;
+            LastVelocity = velocity;
         }
     }
 }

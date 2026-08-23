@@ -4,6 +4,8 @@ namespace Game.Core.Cannon
 {
     public interface IBallLauncher
     {
-        void LaunchTowards(Vector3 worldTarget);
+        Vector3 MuzzlePosition { get; }
+
+        void Launch(Vector3 velocity);
     }
 }

@@ -22,10 +22,10 @@
   <Project Path="Unity.Burst.Editor.csproj" />
   <Project Path="Unity.Rider.Editor.csproj" />
   <Project Path="Unity.VisualScripting.State.csproj" />
+  <Project Path="Game.Core.csproj" />
   <Project Path="Unity.AI.Navigation.Updater.csproj" />
   <Project Path="Unity.AI.Navigation.Editor.csproj" />
   <Project Path="Game.Runtime.csproj" />
-  <Project Path="Game.Core.csproj" />
   <Project Path="Unity.AI.Navigation.csproj" />
   <Project Path="Unity.Collections.CodeGen.csproj" />
   <Project Path="Unity.Mathematics.Editor.csproj" />

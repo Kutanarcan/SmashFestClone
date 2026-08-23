@@ -1,3 +1,4 @@
+using Game.Core.Impacts;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -13,11 +14,13 @@ public class CannonBall : MonoBehaviour
     [SerializeField] private LayerMask breakableLayers;
 
     private Rigidbody rb;
+    private PunchThrough punchThrough;
     private Vector3 velocityBeforeCollision;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        punchThrough = new PunchThrough(breakableSpeedRetention);
     }
 
     public void Launch(Vector3 velocity)
@@ -35,9 +38,9 @@ public class CannonBall : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        bool isBreakable = (breakableLayers.value & (1 << collision.gameObject.layer)) != 0;
-        if (!isBreakable) return;
+        bool hitBreakable = (breakableLayers.value & (1 << collision.gameObject.layer)) != 0;
 
-        rb.linearVelocity = velocityBeforeCollision * breakableSpeedRetention;
+        if (punchThrough.TryResolve(velocityBeforeCollision, hitBreakable, out Vector3 velocity))
+            rb.linearVelocity = velocity;
     }
 }

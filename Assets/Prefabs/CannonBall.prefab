@@ -190,7 +190,7 @@ GameObject:
   m_Component:
   - component: {fileID: 432908992718056950}
   - component: {fileID: 2035467925320227800}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -309,7 +309,7 @@ GameObject:
   - component: {fileID: 7508981503075197153}
   - component: {fileID: 6841124560960164}
   - component: {fileID: 3292614872538204983}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: CannonBall
   m_TagString: Untagged
   m_Icon: {fileID: 0}

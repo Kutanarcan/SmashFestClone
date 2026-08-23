@@ -6,6 +6,7 @@ using Game.Core.Firing;
 using Game.Core.Inputs;
 using Game.Core.Timing;
 using Game.Runtime.Cannon;
+using Game.Runtime.Levels;
 using UnityEngine;
 
 public class CannonController : MonoBehaviour, ITickable
@@ -41,7 +42,11 @@ public class CannonController : MonoBehaviour, ITickable
 
     private CannonBrain brain;
 
-    public void Initialize(IPointerInputSource input, ITimeProvider time)
+    public void Initialize(
+        IPointerInputSource input,
+        ITimeProvider time,
+        IAmmoSource ammo,
+        BallRegistry ballRegistry)
     {
         if (cam == null) cam = Camera.main;
 
@@ -49,8 +54,8 @@ public class CannonController : MonoBehaviour, ITickable
             input,
             new CameraAimRaycaster(cam, aimLayerMask, maxAimDistance),
             new TransformBarrelView(barrel, barrelAxisOffset, rotationSpeed),
-            new CannonBallLauncher(muzzle, ballPrefab),
-            new FireControl(time, fireCooldown),
+            new CannonBallLauncher(muzzle, ballPrefab, ballRegistry),
+            new FireGate(new FireControl(time, fireCooldown), ammo),
             new BarrelAim(minElevation, maxElevation, maxYaw),
             new BallisticAim(new BallisticSolver(-Physics.gravity.y), launchSpeed, arc));
     }

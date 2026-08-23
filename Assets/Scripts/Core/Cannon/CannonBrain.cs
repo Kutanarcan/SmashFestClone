@@ -13,7 +13,7 @@ namespace Game.Core.Cannon
         private readonly IAimRaycaster raycaster;
         private readonly IBarrelView barrel;
         private readonly IBallLauncher launcher;
-        private readonly FireControl fireControl;
+        private readonly FireGate fireGate;
         private readonly BarrelAim barrelAim;
         private readonly BallisticAim ballisticAim;
 
@@ -25,7 +25,7 @@ namespace Game.Core.Cannon
             IAimRaycaster raycaster,
             IBarrelView barrel,
             IBallLauncher launcher,
-            FireControl fireControl,
+            FireGate fireGate,
             BarrelAim barrelAim,
             BallisticAim ballisticAim)
         {
@@ -33,7 +33,7 @@ namespace Game.Core.Cannon
             this.raycaster = raycaster ?? throw new ArgumentNullException(nameof(raycaster));
             this.barrel = barrel ?? throw new ArgumentNullException(nameof(barrel));
             this.launcher = launcher ?? throw new ArgumentNullException(nameof(launcher));
-            this.fireControl = fireControl ?? throw new ArgumentNullException(nameof(fireControl));
+            this.fireGate = fireGate ?? throw new ArgumentNullException(nameof(fireGate));
             this.barrelAim = barrelAim;
             this.ballisticAim = ballisticAim;
         }
@@ -65,7 +65,7 @@ namespace Game.Core.Cannon
             CanReachAim = ballisticAim.TryVelocityTo(
                 launcher.MuzzlePosition, aimPoint, out launchVelocity);
 
-            if (!fireControl.TryFire())
+            if (!fireGate.TryFire())
                 return;
 
             launcher.Launch(launchVelocity);

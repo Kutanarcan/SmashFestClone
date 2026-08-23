@@ -24,6 +24,7 @@ namespace Game.Tests.EditMode
         private FakeBarrelView barrel;
         private FakeBallLauncher launcher;
         private FakeTimeProvider time;
+        private FakeAmmoSource ammo;
         private CannonBrain brain;
 
         [SetUp]
@@ -34,6 +35,7 @@ namespace Game.Tests.EditMode
             barrel = new FakeBarrelView();
             launcher = new FakeBallLauncher { MuzzlePosition = Vector3.zero };
             time = new FakeTimeProvider();
+            ammo = new FakeAmmoSource();
 
             brain = Build(gravity: 0f);
         }
@@ -43,7 +45,7 @@ namespace Game.Tests.EditMode
             raycaster,
             barrel,
             launcher,
-            new FireControl(time, Cooldown),
+            new FireGate(new FireControl(time, Cooldown), ammo),
             new BarrelAim(MinElevation, MaxElevation, MaxYaw),
             new BallisticAim(new BallisticSolver(gravity), LaunchSpeed, ArcPreference.Low));
 
@@ -182,6 +184,24 @@ namespace Game.Tests.EditMode
         }
 
         [Test]
+        public void WhenAmmoRunsOut_TapsAimButDoNotLaunch()
+        {
+            ammo.Remaining = 1;
+
+            input.PressAt(Vector2.zero);
+            brain.Tick(Dt);
+            Assert.AreEqual(1, launcher.LaunchCount);
+
+            time.Advance(Cooldown);
+            raycaster.HitPoint = new Vector3(4f, 0f, 4f);
+            input.PressAt(Vector2.zero);
+            brain.Tick(Dt);
+
+            Assert.AreEqual(1, launcher.LaunchCount);
+            Assert.AreEqual(new Vector3(4f, 0f, 4f), brain.AimPoint);
+        }
+
+        [Test]
         public void Barrel_IsNotTouchedBeforeFirstAim()
         {
             brain.Tick(Dt);
@@ -239,7 +259,7 @@ namespace Game.Tests.EditMode
         [Test]
         public void NullDependencies_Throw()
         {
-            var fire = new FireControl(time, Cooldown);
+            var fire = new FireGate(new FireControl(time, Cooldown), ammo);
             var aim = new BarrelAim(MinElevation, MaxElevation, MaxYaw);
             var ballistic = new BallisticAim(new BallisticSolver(15f), LaunchSpeed, ArcPreference.Low);
 

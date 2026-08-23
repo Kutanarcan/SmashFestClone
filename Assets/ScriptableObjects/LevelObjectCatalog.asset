@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3819113425656bd458bf2c647ebbcd47, type: 3}
+  m_Name: LevelObjectCatalog
+  m_EditorClassIdentifier: Game.Runtime::LevelObjectCatalog
+  entries:
+  - type: Cube
+    prefab: {fileID: 5721684948506986569, guid: 41e1b55e243edb8449bffb60a4a4def7, type: 3}
+  - type: Jar
+    prefab: {fileID: 8841438857784014639, guid: fbc324e27f7a6d349896606499379411, type: 3}
+  - type: Prizm
+    prefab: {fileID: 9010451435559492135, guid: 09a39de7e085ad546b8b7f4e0a2b7c9b, type: 3}

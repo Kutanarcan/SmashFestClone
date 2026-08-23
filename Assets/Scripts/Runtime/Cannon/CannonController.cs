@@ -1,8 +1,11 @@
+using Game.Core;
 using Game.Core.Aiming;
+using Game.Core.Firing;
+using Game.Core.Inputs;
+using Game.Core.Timing;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-public class CannonController : MonoBehaviour
+public class CannonController : MonoBehaviour, ITickable
 {
     [Header("References")]
     [SerializeField] private Transform barrel;
@@ -31,40 +34,35 @@ public class CannonController : MonoBehaviour
     [SerializeField] private float fireCooldown = 0.35f;
     [SerializeField] private float maxAimDistance = 500f;
 
-    private float lastFireTime = -999f;
+    private IPointerInputSource input;
+    private FireControl fireControl;
+
     private Vector3 aimPoint;
     private bool hasAimed;
 
-    public bool CanFire => Time.time >= lastFireTime + fireCooldown;
+    public bool CanFire => fireControl != null && fireControl.CanFire;
+
+    public void Initialize(IPointerInputSource input, ITimeProvider time)
+    {
+        this.input = input;
+        fireControl = new FireControl(time, fireCooldown);
+    }
 
     private void Awake()
     {
         if (cam == null) cam = Camera.main;
+
         aimPoint = muzzle != null ? muzzle.position + transform.forward * 10f : Vector3.zero;
     }
 
-    private void Update()
+    public void Tick(float deltaTime)
     {
-        if (WasPressedThisFrame() && !IsPointerOverUI())
-            HandleTap(GetPointerPosition());
+        if (input == null) return;
 
-        UpdateBarrelRotation();
-    }
+        if (input.WasPressedThisFrame && !input.IsOverUI)
+            HandleTap(input.Position);
 
-    private bool WasPressedThisFrame()
-    {
-        return Pointer.current != null && Pointer.current.press.wasPressedThisFrame;
-    }
-
-    private Vector2 GetPointerPosition()
-    {
-        return Pointer.current.position.ReadValue();
-    }
-
-    private bool IsPointerOverUI()
-    {
-        return UnityEngine.EventSystems.EventSystem.current != null
-            && UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject();
+        UpdateBarrelRotation(deltaTime);
     }
 
     private void HandleTap(Vector2 screenPos)
@@ -72,7 +70,7 @@ public class CannonController : MonoBehaviour
         if (!ResolveAimPoint(screenPos))
             return;
 
-        if (!CanFire)
+        if (!fireControl.TryFire())
             return;
 
         Fire();
@@ -92,15 +90,13 @@ public class CannonController : MonoBehaviour
 
     private void Fire()
     {
-        lastFireTime = Time.time;
-
         Vector3 dir = (aimPoint - muzzle.position).normalized;
 
         CannonBall ball = Instantiate(ballPrefab, muzzle.position, Quaternion.LookRotation(dir));
         ball.Launch(dir * launchSpeed);
     }
 
-    private void UpdateBarrelRotation()
+    private void UpdateBarrelRotation(float deltaTime)
     {
         if (!hasAimed || barrel == null) return;
 
@@ -118,8 +114,9 @@ public class CannonController : MonoBehaviour
 
         barrel.localRotation = rotationSpeed <= 0f
             ? target
-            : Quaternion.Slerp(barrel.localRotation, target, rotationSpeed * Time.deltaTime);
+            : Quaternion.Slerp(barrel.localRotation, target, rotationSpeed * deltaTime);
     }
+
     private void OnDrawGizmos()
     {
         if (!Application.isPlaying || !hasAimed || muzzle == null) return;

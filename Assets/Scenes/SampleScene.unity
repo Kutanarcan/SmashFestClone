@@ -1738,6 +1738,51 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 41e1b55e243edb8449bffb60a4a4def7, type: 3}
+--- !u!1 &501682673
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 501682675}
+  - component: {fileID: 501682674}
+  m_Layer: 0
+  m_Name: GameInstaller
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &501682674
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 501682673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d26369dab907a794d9ddf6862cc4d01d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Runtime::GameInstaller
+  cannon: {fileID: 772281307922822082}
+--- !u!4 &501682675
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 501682673}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &501928074 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1119434231020301071, guid: 41e1b55e243edb8449bffb60a4a4def7, type: 3}
@@ -8261,6 +8306,17 @@ PrefabInstance:
       addedObject: {fileID: 397498947}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9adbeb7e0510937449ad010ce01f154b, type: 3}
+--- !u!114 &772281307922822082 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8663214148298925396, guid: 9adbeb7e0510937449ad010ce01f154b, type: 3}
+  m_PrefabInstance: {fileID: 772281307922822081}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 218bc069266240b4c91607236fcb66ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CannonController
 --- !u!1001 &2020287236419662367
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8450,6 +8506,7 @@ SceneRoots:
   - {fileID: 330585546}
   - {fileID: 410087041}
   - {fileID: 832575519}
+  - {fileID: 501682675}
   - {fileID: 9143380246471483122}
   - {fileID: 2020287236419662367}
   - {fileID: 772281307922822081}

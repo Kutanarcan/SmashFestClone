@@ -13,6 +13,12 @@ public class LevelObjectCatalog : ScriptableObject
 
     [SerializeField] private Entry[] entries;
 
+    public int Count => entries?.Length ?? 0;
+
+    public string TypeAt(int index) => entries[index].type;
+
+    public GameObject PrefabAt(int index) => entries[index].prefab;
+
     public bool TryGetPrefab(string type, out GameObject prefab)
     {
         prefab = null;

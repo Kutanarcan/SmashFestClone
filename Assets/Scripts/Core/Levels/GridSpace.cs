@@ -38,6 +38,15 @@ namespace Game.Core.Levels
             return minCorner + halfBlock;
         }
 
+        public static CellIndex CellForBlockCenter(
+            Vector3 center, CellSpan span, Vector3 unitSize, Vector3 gridOrigin)
+        {
+            return new CellIndex(
+                RoundAxis(center.x - gridOrigin.x - span.Width * unitSize.x * 0.5f, unitSize.x),
+                RoundAxis(center.y - gridOrigin.y - span.Height * unitSize.y * 0.5f, unitSize.y),
+                RoundAxis(center.z - gridOrigin.z - span.Depth * unitSize.z * 0.5f, unitSize.z));
+        }
+
         public static CellIndex WorldToCell(Vector3 world, Vector3 unitSize, Vector3 gridOrigin)
         {
             return new CellIndex(
@@ -58,6 +67,13 @@ namespace Game.Core.Levels
             if (unit <= 0f) return 1;
 
             return Mathf.Max(1, Mathf.RoundToInt(size / unit));
+        }
+
+        private static int RoundAxis(float offset, float unit)
+        {
+            if (unit <= 0f) return 0;
+
+            return Mathf.RoundToInt(offset / unit);
         }
 
         private static int FloorAxis(float offset, float unit)

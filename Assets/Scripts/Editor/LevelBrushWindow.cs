@@ -28,6 +28,9 @@ namespace Game.Editor
         [SerializeField] private float rotationStep = 90f;
         [SerializeField] private BrushTool tool = BrushTool.Paint;
         [SerializeField] private bool brushEnabled;
+        [SerializeField] private string levelId = "level_01";
+        [SerializeField] private int ballCount = 5;
+        [SerializeField] private float platformThickness = 0.5f;
         [SerializeField] private List<SavedPlacement> saved = new List<SavedPlacement>();
 
         private readonly LevelScenePreview preview = new LevelScenePreview();
@@ -39,12 +42,24 @@ namespace Game.Editor
         [MenuItem("Tools/SmashFest/Level Brush")]
         private static void Open() => GetWindow<LevelBrushWindow>("Level Brush");
 
-        private void OnEnable() => RebuildGrid();
+        private void OnEnable()
+        {
+            Undo.undoRedoPerformed += OnUndoRedo;
+            RebuildGrid();
+        }
 
         private void OnDisable()
         {
+            Undo.undoRedoPerformed -= OnUndoRedo;
             preview.Destroy();
             BrushFootprint.ClearCache();
+        }
+
+        private void OnUndoRedo()
+        {
+            ReloadGridFromSaved();
+            RefreshPreview();
+            Repaint();
         }
 
         private void OnGUI()
@@ -141,6 +156,20 @@ namespace Game.Editor
 
             yaw = EditorGUILayout.FloatField("Paint Yaw", yaw);
             rotationStep = EditorGUILayout.FloatField("Rotation Step", rotationStep);
+
+            EditorGUILayout.Space();
+            levelId = EditorGUILayout.TextField("Level Id", levelId);
+            ballCount = Mathf.Max(0, EditorGUILayout.IntField("Ball Count", ballCount));
+            platformThickness = EditorGUILayout.FloatField("Platform Thickness", platformThickness);
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                using (new EditorGUI.DisabledScope(catalog == null))
+                {
+                    if (GUILayout.Button("Save Level JSON")) SaveLevel();
+                    if (GUILayout.Button("Load Level JSON")) LoadLevel();
+                }
+            }
         }
 
         private GameObject SelectedPrefab =>
@@ -159,6 +188,8 @@ namespace Game.Editor
 
         private void Apply(BrushTool active, CellIndex cell)
         {
+            Undo.RecordObject(this, $"{active} level cell");
+
             bool changed;
 
             switch (active)
@@ -207,7 +238,7 @@ namespace Game.Editor
                 cell, BrushPaletteGui.SpanFor(footprint, unitSize, nextYaw), nextYaw);
         }
 
-        private void RebuildGrid()
+        private void ReloadGridFromSaved()
         {
             Vector2Int size = GridSpace.GridSizeFor(platformSize, new Vector2(unitSize.x, unitSize.z));
 
@@ -226,9 +257,80 @@ namespace Game.Editor
 
             grid = rebuilt;
             level = Mathf.Clamp(level, 0, levels - 1);
+        }
+
+        private void RebuildGrid()
+        {
+            ReloadGridFromSaved();
 
             SaveGrid();
             RefreshPreview();
+        }
+
+        private CellLayout Layout() =>
+            new CellLayout(unitSize, preview.OriginFor(grid, unitSize, levelAnchor));
+
+        private PlatformSpec[] PlatformSpecs()
+        {
+            Vector3 anchor = levelAnchor != null ? levelAnchor.position : Vector3.zero;
+
+            return new[]
+            {
+                new PlatformSpec(
+                    anchor - new Vector3(0f, platformThickness * 0.5f, 0f),
+                    new Vector3(platformSize.x, platformThickness, platformSize.y))
+            };
+        }
+
+        private void SaveLevel()
+        {
+            if (grid == null || catalog == null) return;
+
+            LevelDefinition level = GridLevelConverter.ToDefinition(
+                grid, Layout(), new CatalogObjectSizes(catalog),
+                levelId, ballCount, PlatformSpecs());
+
+            LevelJsonIo.Save(level, string.IsNullOrWhiteSpace(levelId) ? "level" : levelId);
+        }
+
+        private void LoadLevel()
+        {
+            if (grid == null || catalog == null) return;
+            if (!LevelJsonIo.TryLoad(out LevelDefinition loaded)) return;
+
+            Undo.RecordObject(this, "Load level");
+
+            levelId = loaded.id;
+            ballCount = loaded.ballCount;
+
+            if (loaded.platforms.Length > 0)
+            {
+                Vector3 size = loaded.platforms[0].size;
+                platformSize = new Vector2(size.x, size.z);
+                platformThickness = size.y;
+            }
+
+            ReloadEmptyGrid();
+
+            int placed = GridLevelConverter.Fill(grid, loaded, Layout(), new CatalogObjectSizes(catalog));
+
+            if (placed < loaded.objects.Length)
+            {
+                Debug.LogWarning(
+                    $"Loaded {placed} of {loaded.objects.Length} objects. " +
+                    "The rest fell outside the grid or use unknown types.");
+            }
+
+            SaveGrid();
+            RefreshPreview();
+        }
+
+        private void ReloadEmptyGrid()
+        {
+            Vector2Int size = GridSpace.GridSizeFor(platformSize, new Vector2(unitSize.x, unitSize.z));
+
+            grid = new LevelGrid(size.x, levels, size.y);
+            level = Mathf.Clamp(level, 0, levels - 1);
         }
 
         private void SaveGrid()

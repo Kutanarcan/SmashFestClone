@@ -1,3 +1,4 @@
+using System;
 using Game.Core.Impacts;
 using UnityEngine;
 
@@ -16,6 +17,9 @@ public class CannonBall : MonoBehaviour
     private Rigidbody rb;
     private PunchThrough punchThrough;
     private Vector3 velocityBeforeCollision;
+    private Action<CannonBall> release;
+    private float despawnAt;
+    private bool live;
 
     private void Awake()
     {
@@ -23,24 +27,45 @@ public class CannonBall : MonoBehaviour
         punchThrough = new PunchThrough(breakableSpeedRetention);
     }
 
-    public void Launch(Vector3 velocity)
+    public void Launch(Vector3 velocity, Action<CannonBall> release)
     {
-        rb.linearVelocity = velocity;
-        velocityBeforeCollision = velocity;
+        this.release = release;
 
-        Destroy(gameObject, maxLifetime);
+        rb.linearVelocity = velocity;
+        rb.angularVelocity = Vector3.zero;
+
+        velocityBeforeCollision = velocity;
+        despawnAt = Time.time + maxLifetime;
+        live = true;
     }
 
     private void FixedUpdate()
     {
+        if (!live) return;
+
         velocityBeforeCollision = rb.linearVelocity;
+
+        if (Time.time >= despawnAt) Despawn();
     }
 
     private void OnCollisionEnter(Collision collision)
     {
+        if (!live) return;
+
         bool hitBreakable = (breakableLayers.value & (1 << collision.gameObject.layer)) != 0;
 
         if (punchThrough.TryResolve(velocityBeforeCollision, hitBreakable, out Vector3 velocity))
             rb.linearVelocity = velocity;
+    }
+
+    private void Despawn()
+    {
+        live = false;
+
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
+        if (release != null) release(this);
+        else Destroy(gameObject);
     }
 }

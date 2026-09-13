@@ -15,8 +15,11 @@ namespace Game.Core.Firing
 
         public bool TryFire()
         {
-            if (!cooldown.CanFire) return false;
-            if (!ammo.TryConsumeBall()) return false;
+            if (!cooldown.CanFire) 
+                return false;
+
+            if (!ammo.TryConsumeBall()) 
+                return false;
 
             return cooldown.TryFire();
         }

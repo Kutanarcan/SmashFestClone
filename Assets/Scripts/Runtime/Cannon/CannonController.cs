@@ -7,6 +7,7 @@ using Game.Core.Inputs;
 using Game.Core.Timing;
 using Game.Runtime.Cannon;
 using Game.Runtime.Levels;
+using Game.Runtime.Pooling;
 using UnityEngine;
 
 public class CannonController : MonoBehaviour, ITickable
@@ -16,7 +17,6 @@ public class CannonController : MonoBehaviour, ITickable
 
     [SerializeField] private Transform muzzle;
 
-    [SerializeField] private CannonBall ballPrefab;
     [SerializeField] private Camera cam;
 
     [Header("Aiming")]
@@ -46,6 +46,7 @@ public class CannonController : MonoBehaviour, ITickable
         IPointerInputSource input,
         ITimeProvider time,
         IAmmoSource ammo,
+        GameObjectPool<CannonBall> ballPool,
         BallRegistry ballRegistry)
     {
         if (cam == null) cam = Camera.main;
@@ -54,7 +55,7 @@ public class CannonController : MonoBehaviour, ITickable
             input,
             new CameraAimRaycaster(cam, aimLayerMask, maxAimDistance),
             new TransformBarrelView(barrel, barrelAxisOffset, rotationSpeed),
-            new CannonBallLauncher(muzzle, ballPrefab, ballRegistry),
+            new CannonBallLauncher(muzzle, ballPool, ballRegistry),
             new FireGate(new FireControl(time, fireCooldown), ammo),
             new BarrelAim(minElevation, maxElevation, maxYaw),
             new BallisticAim(new BallisticSolver(-Physics.gravity.y), launchSpeed, arc));

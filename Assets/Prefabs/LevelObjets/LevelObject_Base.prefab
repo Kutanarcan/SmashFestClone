@@ -42,6 +42,7 @@ GameObject:
   - component: {fileID: 7370675295614168950}
   - component: {fileID: 4660322474848266295}
   - component: {fileID: 5623139926513626904}
+  - component: {fileID: 6430759522202964882}
   m_Layer: 0
   m_Name: LevelObject_Base
   m_TagString: Untagged
@@ -105,6 +106,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40f34f1e36ebe2d4c8ab4a38d005753d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game.Runtime::LevelObjective
+--- !u!114 &6430759522202964882
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2785304317110881328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5ae2fbc6c252a34e9cefdd2a9b850c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Runtime::DespawnOnGrounded
+  delay: 1.5
 --- !u!1 &4869639538335999079
 GameObject:
   m_ObjectHideFlags: 0

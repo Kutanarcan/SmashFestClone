@@ -5,9 +5,6 @@ using UnityEngine;
 
 public class LevelLoader : MonoBehaviour
 {
-    [Header("Source")]
-    [SerializeField] private TextAsset levelJson;
-
     [Header("Spawning")]
     [SerializeField] private LevelObjectCatalog catalog;
 
@@ -20,14 +17,17 @@ public class LevelLoader : MonoBehaviour
 
     [SerializeField] private float settleTimeout = 3f;
 
+    private readonly List<GameObject> spawned = new List<GameObject>();
     private readonly List<LevelObjective> objectives = new List<LevelObjective>();
     private readonly List<Rigidbody> objectiveBodies = new List<Rigidbody>();
 
-    public LevelSession Load(BallRegistry ballRegistry)
+    public LevelSession Load(TextAsset levelJson, BallRegistry ballRegistry)
     {
+        Unload();
+
         if (levelJson == null)
         {
-            Debug.LogError($"{nameof(LevelLoader)}: no level JSON assigned.", this);
+            Debug.LogError($"{nameof(LevelLoader)}: no level JSON supplied.", this);
             return null;
         }
 
@@ -36,9 +36,6 @@ public class LevelLoader : MonoBehaviour
             Debug.LogError($"{nameof(LevelLoader)}: {error}", this);
             return null;
         }
-
-        objectives.Clear();
-        objectiveBodies.Clear();
 
         SpawnPlatforms(level);
         SpawnObjects(level);
@@ -50,6 +47,18 @@ public class LevelLoader : MonoBehaviour
             objectives[i].Initialize(i, session, groundLayers);
 
         return session;
+    }
+
+    public void Unload()
+    {
+        for (int i = spawned.Count - 1; i >= 0; i--)
+        {
+            if (spawned[i] != null) Destroy(spawned[i]);
+        }
+
+        spawned.Clear();
+        objectives.Clear();
+        objectiveBodies.Clear();
     }
 
     private void SpawnPlatforms(LevelDefinition level)
@@ -67,12 +76,14 @@ public class LevelLoader : MonoBehaviour
             GameObject instance = Instantiate(
                 platformPrefab, spec.position, Quaternion.identity, levelRoot);
 
+            spawned.Add(instance);
+
             PlatformView view = instance.GetComponent<PlatformView>();
 
             if (view != null)
                 view.SetSize(spec.size);
             else
-                Debug.LogWarning($"{nameof(LevelLoader)}: platform prefab has no {nameof(PlatformView)}, size ignored.", this);
+                Debug.LogWarning($"{nameof(LevelLoader)}: platform prefab has no {nameof(PlatformView)}.", this);
         }
     }
 
@@ -96,6 +107,8 @@ public class LevelLoader : MonoBehaviour
 
             GameObject instance = Instantiate(
                 prefab, placed.position, Quaternion.Euler(placed.rotation), levelRoot);
+
+            spawned.Add(instance);
 
             LevelObjective objective = instance.GetComponent<LevelObjective>();
 

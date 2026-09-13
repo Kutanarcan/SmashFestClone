@@ -49,8 +49,11 @@ namespace Game.Core.Levels
 
         public bool TryConsumeBall()
         {
-            if (State != LevelState.Playing) return false;
-            if (BallsRemaining <= 0) return false;
+            if (State != LevelState.Playing)
+                return false;
+
+            if (BallsRemaining <= 0)
+                return false;
 
             BallsRemaining--;
 
@@ -68,8 +71,11 @@ namespace Game.Core.Levels
             if (index < 0 || index >= cleared.Length)
                 throw new ArgumentOutOfRangeException(nameof(index));
 
-            if (IsFinished) return;
-            if (cleared[index]) return;
+            if (IsFinished) 
+                return;
+
+            if (cleared[index])
+                return;
 
             cleared[index] = true;
             ObjectivesRemaining--;
@@ -80,7 +86,8 @@ namespace Game.Core.Levels
 
         public void Tick(float deltaTime)
         {
-            if (State != LevelState.Settling) return;
+            if (State != LevelState.Settling)
+                return;
 
             settleElapsed += deltaTime;
 

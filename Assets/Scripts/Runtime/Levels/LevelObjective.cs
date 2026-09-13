@@ -1,3 +1,4 @@
+using System;
 using Game.Core.Impacts;
 using Game.Core.Levels;
 using UnityEngine;
@@ -9,6 +10,9 @@ public class LevelObjective : MonoBehaviour
     private LayerMask groundLayers;
     private int index;
     private bool reported;
+    private bool grounded;
+
+    public event Action Grounded;
 
     public void Initialize(int index, LevelSession session, LayerMask groundLayers)
     {
@@ -30,6 +34,11 @@ public class LevelObjective : MonoBehaviour
         if ((groundLayers.value & (1 << collision.gameObject.layer)) == 0) return;
 
         Report();
+
+        if (grounded) return;
+
+        grounded = true;
+        Grounded?.Invoke();
     }
 
     private void OnBroke(in ImpactEvent impact) => Report();

@@ -20,13 +20,16 @@ namespace Game.Core.Breakables
 
         public void TakeImpact(in ImpactEvent impact)
         {
-            if (IsBroken) return;
+            if (IsBroken)
+                return;
 
             float damage = settings.DamageFor(impact);
-            if (damage <= 0f) return;
+            if (damage <= 0f)
+                return;
 
             Health -= damage;
-            if (Health > 0f) return;
+            if (Health > 0f)
+                return;
 
             Health = 0f;
             Broke?.Invoke(impact);

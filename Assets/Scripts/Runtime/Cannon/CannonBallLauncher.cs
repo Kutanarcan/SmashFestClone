@@ -1,5 +1,7 @@
+using System;
 using Game.Core.Cannon;
 using Game.Runtime.Levels;
+using Game.Runtime.Pooling;
 using UnityEngine;
 
 namespace Game.Runtime.Cannon
@@ -9,28 +11,36 @@ namespace Game.Runtime.Cannon
         private const float MinVelocitySqrMagnitude = 0.0001f;
 
         private readonly Transform muzzle;
-        private readonly CannonBall prefab;
+        private readonly GameObjectPool<CannonBall> pool;
         private readonly BallRegistry registry;
+        private readonly Action<CannonBall> releaseHandler;
 
-        public CannonBallLauncher(Transform muzzle, CannonBall prefab, BallRegistry registry)
+        public CannonBallLauncher(
+            Transform muzzle, GameObjectPool<CannonBall> pool, BallRegistry registry)
         {
             this.muzzle = muzzle;
-            this.prefab = prefab;
+            this.pool = pool;
             this.registry = registry;
+
+            releaseHandler = Release;
         }
 
         public Vector3 MuzzlePosition => muzzle != null ? muzzle.position : Vector3.zero;
 
         public void Launch(Vector3 velocity)
         {
-            if (muzzle == null || prefab == null) return;
+            if (muzzle == null || pool == null) return;
             if (velocity.sqrMagnitude < MinVelocitySqrMagnitude) return;
 
-            CannonBall ball = Object.Instantiate(
-                prefab, muzzle.position, Quaternion.LookRotation(velocity.normalized));
+            CannonBall ball = pool.Get(
+                muzzle.position, Quaternion.LookRotation(velocity.normalized));
+
+            if (ball == null) return;
 
             registry?.Register(ball);
-            ball.Launch(velocity);
+            ball.Launch(velocity, releaseHandler);
         }
+
+        private void Release(CannonBall ball) => pool.Release(ball);
     }
 }

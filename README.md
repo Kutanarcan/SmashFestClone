@@ -5,8 +5,9 @@ A 2–3 day Unity clone of the trending mobile game **Smash Fest**. Tap to aim, 
 ## Gameplay
 
 | | |
-|---|---|
-| [▶ Gameplay 01](Docs/Gameplay_01.mp4) | [▶ Gameplay 02](Docs/Gameplay_02.mp4) |
+|-|-|
+https://github.com/user-attachments/assets/2d6ee734-4576-4ad1-962a-ac18885d12e0
+https://github.com/user-attachments/assets/27ca8924-7bb5-4fe0-a540-a223f7d05e29
 
 ## Features
 
